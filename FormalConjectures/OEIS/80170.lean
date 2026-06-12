@@ -61,11 +61,11 @@ def PrimePowerCondition (k : ℕ) : Prop :=
   let P := ((Nat.divisors k).filter IsPrimePow).max.getD 0
   k / P > P
 
-/- ## Supporting theory for the proof (following "A Proof of the OEIS A080170 Binomial GCD Criterion") -/
+/- ## Supporting theory for the proof -/
 
 /- ## Supporting definitions -/
 
-/-- The binomial GCD of the paper (Section 1):
+/-- The binomial GCD
 `D k = gcd_{2 ≤ q ≤ k+1} C(qk, k)`. -/
 def D (k : ℕ) : ℕ :=
   (Finset.Icc 2 (k + 1)).gcd fun q => Nat.choose (q * k) k
@@ -74,8 +74,8 @@ def D (k : ℕ) : ℕ :=
 `ppart n = max { p^a : p^a ∥ n }` for `n > 1`, where `p^a ∥ n` means
 `p^a ∣ n ∧ ¬ p^(a+1) ∣ n`.  For each prime `p ∣ n`, the exact component is
 `p ^ (n.factorization p)`, so the maximum is the `Finset.sup` over
-`n.primeFactors`.  (For `n ≤ 1` this yields the junk value `0`; the paper
-only defines `ppart` for `n > 1`.) -/
+`n.primeFactors`.  (For `n ≤ 1` this yields the junk value `0`; `ppart`
+is only meaningful for `n > 1`.) -/
 def ppart (n : ℕ) : ℕ :=
   n.primeFactors.sup fun p => p ^ n.factorization p
 
@@ -100,7 +100,7 @@ private lemma ringChoose_eq_inv_factorial_mul_eval (t : ℚ) (r : ℕ) :
   rw [Ring.choose_eq_smul, smul_eq_mul, ← Polynomial.aeval_eq_smeval,
     Polynomial.aeval_def, ← Polynomial.eval_map, descPochhammer_map]
 
-/-- **Lemma (Newton interpolation by forward differences)** [lem:newton].
+/-- **Lemma (Newton interpolation by forward differences)**.
 "Let `f` be a polynomial of degree at most `d`, and define
 `Δf(x) = f(x+1) − f(x)`.  For every integer `a` and every `x`,
 `f(x) = ∑_{r=0}^{d} C(x−a, r) · Δ^r f(a)`."
@@ -196,7 +196,7 @@ private lemma lucas_aux_digit {p : ℕ} (hp : p.Prime) {n k : ℕ} (hn : n < p) 
       exact (hdvd.mul_right _).mul_right _
     exact absurd (hp.dvd_factorial.mp h1) (Nat.not_le.mpr hn)
 
-/-- **Lemma (Lucas non-vanishing criterion)** [lem:lucas].
+/-- **Lemma (Lucas non-vanishing criterion)**.
 "Let `p` be prime, and write `N = ∑ N_i p^i`, `K = ∑ K_i p^i` with
 `0 ≤ N_i, K_i < p`.  Then `C(N, K) ≢ 0 (mod p)  ↔  K_i ≤ N_i` for every `i`."
 
@@ -244,7 +244,7 @@ private lemma ringChoose_neg_one (r : ℕ) :
     mul_comm ((-1 : ℚ) ^ r) _, ← mul_assoc,
     inv_mul_cancel₀ (Nat.cast_ne_zero.mpr r.factorial_ne_zero), one_mul]
 
-/-- **Lemma** [lem:prime-divides-n].
+/-- **Lemma (Prime divisors of the GCD)**.
 "Let `k ≥ 1` and `D(k) = gcd_{2 ≤ q ≤ k+1} C(qk, k)`.
 If a prime `p` divides `D(k)`, then `p ∣ k+1`." -/
 theorem prime_dvd_succ_of_dvd_D (k p : ℕ) (hk : 1 ≤ k)
@@ -511,7 +511,7 @@ lemma gap_bound_aux (p : ℕ) (hp : 0 < p) :
             _ = z + p ^ L := by rw [h2]
             _ ≤ z + p ^ (L + 1 - 1) := by simp
 
-/-- **Lemma (Gap bound)** [lem:gap].
+/-- **Lemma (Gap bound)**.
 "Let `P = p^L` and `0 ≤ c < P`.  If the elements of `𝒟_c` are listed in
 increasing order, every gap between two consecutive elements is at most
 `P/p`."
@@ -530,7 +530,7 @@ theorem gap_bound (p L c : ℕ) (hp : p.Prime) (hL : 1 ≤ L) (hc : c < p ^ L) :
   rw [hdiv]
   exact gap_bound_aux p hp0 L hL c hc
 
-/-- **Lemma (No nonzero translation)** [lem:translation].
+/-- **Lemma (No nonzero translation)**.
 "Let `P = p^L` and `0 ≤ c < P − P/p`.  Suppose `0 ≤ S ≤ c` and
 `[z+S]_P ∈ {0, 1, …, c}` for every `z ∈ 𝒟_c`.  Then `S = 0`."
 
@@ -821,7 +821,7 @@ lemma factorization_p_mul {p : ℕ} (hp : p.Prime) {C : ℕ} (hC : C ≠ 0) :
 /- ### Converse direction: strong induction on the number of digits -/
 
 /-- Converse direction of the stabilizer theorem, for `s` already reduced
-modulo `p^L` (paper Section 4): strong induction on `L`. -/
+modulo `p^L`: strong induction on `L`. -/
 lemma stabilizer_converse (p : ℕ) (hp : p.Prime) :
     ∀ L, 1 ≤ L → ∀ c s, 0 < c → c < p ^ L - p ^ L / p → Nat.Coprime s p →
       s < p ^ L →
@@ -1013,7 +1013,7 @@ lemma stabilizer_converse (p : ℕ) (hp : p.Prime) :
       exact Nat.le_of_mul_le_mul_right h1 hc0p
     omega
 
-/-- **Theorem (Digit-box stabilizer)** [thm:stabilizer].
+/-- **Theorem (Digit-box stabilizer)**.
 "Let `P = p^L` and `0 < c < P − P/p`.  Let `s` be coprime to `p`.  Then
 `[sy]_P ∈ {1, …, c}` for every `y ∈ 𝒟_c \ {0}`
 if and only if `s ≡ 1 (mod p^(L − ord_p(c)))`."
@@ -1223,7 +1223,7 @@ lemma not_dvd_choose_iff_mem_box {p : ℕ} (hp : p.Prime) (L m x : ℕ)
       rw [h1, hdec, hpi]
       omega
 
-/-- **Lemma (Zero-run lemma)** [lem:zero-run].
+/-- **Lemma (Zero-run lemma)**.
 "Let `p` be prime, let `m ≥ 1`, and let `M` be coprime to `p`.  Assume
 `p ∤ m+1`.  Let `P = p^L` be the least power of `p` satisfying `m < P`.
 If `C(m + tM, m) ≡ 0 (mod p)` for `t = 1, …, m`, then `M ≡ −1 (mod P)`."
@@ -1530,7 +1530,7 @@ lemma choose_shift_congr {p : ℕ} (hp : p.Prime) (a b t K : ℕ) (hb : 1 ≤ b)
     (digits_of_mod_pow hp.two_le a _ hqKmod) (digits_of_mod_pow hp.two_le a _ hKmod)
   rwa [hqKdiv, hKdiv] at h
 
-/-- **Lemma** [lem:primary].
+/-- **Lemma (Primary criterion)**.
 "Let `n ≥ 2`, let `p^a ∥ n`, and write `A = p^a`, `n = Ab`, `p ∤ b`.  Put
 `G_n = gcd_{2 ≤ q ≤ n} C(q(n−1), n−1)`.  Then `p ∣ G_n  ↔  b ≤ A`."
 
@@ -1683,12 +1683,12 @@ private lemma exists_ppart_eq (n : ℕ) (hn : 2 ≤ n) :
     Finset.exists_mem_eq_sup n.primeFactors hne (fun p => p ^ n.factorization p)
   exact ⟨p₀, hp₀, hsup⟩
 
-/-- **Theorem (A080170)** [thm:a080170].
+/-- **Theorem (A080170)**.
 "Let `k ≥ 2` and put `n = k+1`.  Then
 `gcd_{2 ≤ q ≤ k+1} C(qk, k) = 1  ↔  n / ppart(n) > ppart(n)`."
 
 Note: `ppart n ∣ n` for `n ≥ 2`, so the natural-number division `n / ppart n`
-is exact, matching the paper's `n / P`. -/
+is exact, matching the `n / P` of `PrimePowerCondition`. -/
 theorem a080170 (k : ℕ) (hk : 2 ≤ k) :
     D k = 1 ↔ (k + 1) / ppart (k + 1) > ppart (k + 1) := by
   set n := k + 1 with hn_def
@@ -1817,7 +1817,7 @@ theorem primePowerCondition_iff_ppart (n : ℕ) (hn : 2 ≤ n) :
 
 /--
 Conjecture: The gcd condition is equivalent to the prime power condition.
-This is now a theorem: the proof below follows the paper "A Proof of the OEIS A080170 Binomial GCD Criterion".
+This is now a theorem: a complete proof is given below.
 -/
 @[category research solved, AMS 11]
 theorem gcdCondition_iff_primePowerCondition (k : ℕ) (hk : 2 ≤ k) :
